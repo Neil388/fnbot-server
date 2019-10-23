@@ -47,7 +47,7 @@ let minifyLogs = config.minifyLogs || true
 if (config.minifyLogs === false) minifyLogs = false
 
 config.routeinit = {
-  defaultVersion: 'v1.1',
+  defaultVersion: 'v1.2',
   routeLocation: './routes/',
   baseUrl: '/api/',
   minifyLogs: minifyLogs
