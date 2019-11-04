@@ -35,19 +35,23 @@ function prepareObject (asset, baseurl) {
 export const routes = [{
   name: '/cosmetics/search',
   run (req, res) {
-    if (!req.headers || !req.headers.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
-    if (!req.headers || !req.headers.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
-    if (!types(req.headers.type)) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
-    const type = types(req.headers.type)
+    const input = {
+      query: req.headers.query || req.query.query,
+      type: req.headers.type || req.query.type
+    }
+    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
+    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
+    const type = types(input.type)
+    if (!type) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
     let Match = (
-      Assets[type].filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === req.headers.query.toLowerCase())[0])[0] || // Name match
-      Assets[type].filter(a => a.id && a.id.toLowerCase() === req.headers.query.toLowerCase())[0] // ID match
+      Assets[type].filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0] || // Name match
+      Assets[type].filter(a => a.id && a.id.toLowerCase() === input.query.toLowerCase())[0] // ID match
     )
-    if (req.headers.query.toLowerCase() === 'random') {
+    if (input.query.toLowerCase() === 'random') {
       Match = Assets[type][Math.floor(Math.random() * Assets[type].length)]
     };
-    if (!Match && type === 'skins' && parseInt(req.headers.query)) {
-      Match = Assets[type].filter(a => a.id && a.id.toLowerCase().split('cid_')[1] && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) === parseInt(req.headers.query))[0]
+    if (!Match && type === 'skins' && parseInt(input.query)) {
+      Match = Assets[type].filter(a => a.id && a.id.toLowerCase().split('cid_')[1] && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) === parseInt(input.query))[0]
     };
     if (Match) {
       Match.baseUrl = req.baseUrl
@@ -86,27 +90,32 @@ export const routes = [{
       msg: 'no_results'
     })
   },
-  description: 'Searches for a specific asset (requires headers query and type).'
+  description: 'Searches for a specific asset (requires queries query and type).'
 },
 {
   name: '/variants/search',
   run (req, res) {
-    if (!req.headers || !req.headers.item) return res.status(400).json({ statusCode: 400, msg: 'Missing header item' })
-    if (!req.headers || !req.headers.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
-    if (!req.headers || !req.headers.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
-    if (!types(req.headers.type)) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
-    const type = types(req.headers.type)
-    const item = Assets[type].filter(a => a.id && a.id === req.headers.item.toLowerCase())[0]
+    const input = {
+      item: req.headers.item || req.query.item,
+      query: req.headers.query || req.query.query,
+      type: req.headers.type || req.query.type
+    }
+    if (!input.item) return res.status(400).json({ statusCode: 400, msg: 'Missing header item' })
+    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
+    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
+    const type = types(input.type)
+    if (!type) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
+    const item = Assets[type].filter(a => a.id && a.id === input.item.toLowerCase())[0]
     if (!item) return res.status(404).json({ statusCode: 404, data: null, msg: 'invalid_item' })
     if (!item.variants || !item.variants[0]) return res.status(404).json({ statusCode: 404, data: null, msg: 'no_results' })
     const Match = (
-      item.variants.filter(t => t.tags && t.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === req.headers.query.toLowerCase())[0])[0])[0] || // Name match
-      item.variants.filter(t => t.tags && t.tags.filter(a => a.tag && a.tag.toLowerCase() === req.headers.query.toLowerCase())[0])[0] // ID match
+      item.variants.filter(t => t.tags && t.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0])[0] || // Name match
+      item.variants.filter(t => t.tags && t.tags.filter(a => a.tag && a.tag.toLowerCase() === input.query.toLowerCase())[0])[0] // ID match
     )
     if (Match) {
       const MatchTag = (
-        Match.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === req.headers.query.toLowerCase())[0])[0] ||
-        Match.tags.filter(a => a.tag && a.tag.toLowerCase() === req.headers.query.toLowerCase())[0]
+        Match.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0] ||
+        Match.tags.filter(a => a.tag && a.tag.toLowerCase() === input.query.toLowerCase())[0]
       )
       return res.status(200).json({ statusCode: 200, data: { parent: item.id, channel: Match.channel, tag: MatchTag.tag, name: MatchTag.name } })
     };

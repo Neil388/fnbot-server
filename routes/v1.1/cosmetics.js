@@ -25,16 +25,20 @@ const types = {
 export const routes = [{
   name: '/cosmetics/search',
   run (req, res) {
-    if (!req.headers || !req.headers.query) return res.send('Error: Missing search header query')
-    if (!req.headers || !req.headers.type) return res.send('Error: Missing type header type')
-    if (!types[req.headers.type]) return res.send('Error: Invalid type.')
-    const type = types[req.headers.type]
+    const input = {
+      query: req.headers.query || req.query.query,
+      type: req.headers.type || req.query.type
+    }
+    if (!input.query) return res.send('Error: Missing search query')
+    if (!input.type) return res.send('Error: Missing query type')
+    const type = types[input.type]
+    if (!type) return res.send('Error: Invalid type.')
     let Match = (
-      global.assets[type].filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === req.headers.query.toLowerCase())[0])[0] || // Name match
-      global.assets[type].filter(a => a.id && a.id.toLowerCase() === req.headers.query.toLowerCase())[0] // ID match
+      global.assets[type].filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0] || // Name match
+      global.assets[type].filter(a => a.id && a.id.toLowerCase() === input.query.toLowerCase())[0] // ID match
     )
-    if (!Match && type === 'skins' && parseInt(req.headers.query)) {
-      Match = global.assets[type].filter(a => a.id && a.id.toLowerCase().split('cid_')[1] && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) === parseInt(req.headers.query))[0]
+    if (!Match && type === 'skins' && parseInt(input.query)) {
+      Match = global.assets[type].filter(a => a.id && a.id.toLowerCase().split('cid_')[1] && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) && parseInt(a.id.toLowerCase().split('cid_')[1].split('_')[0]) === parseInt(input.query))[0]
     };
     if (Match) {
       const results = prepareObject(Match, req.baseUrl)
