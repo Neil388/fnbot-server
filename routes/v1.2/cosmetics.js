@@ -39,8 +39,8 @@ export const routes = [{
       query: req.headers.query || req.query.query,
       type: req.headers.type || req.query.type
     }
-    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
-    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
+    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing search query' })
+    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing type query' })
     const type = types(input.type)
     if (!type) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
     let Match = (
@@ -100,24 +100,27 @@ export const routes = [{
       query: req.headers.query || req.query.query,
       type: req.headers.type || req.query.type
     }
-    if (!input.item) return res.status(400).json({ statusCode: 400, msg: 'Missing header item' })
-    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing header query' })
-    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing header type' })
+    if (!input.item) return res.status(400).json({ statusCode: 400, msg: 'Missing item query' })
+    if (!input.query) return res.status(400).json({ statusCode: 400, msg: 'Missing search query' })
+    if (!input.type) return res.status(400).json({ statusCode: 400, msg: 'Missing type query' })
     const type = types(input.type)
-    if (!type) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
-    const item = Assets[type].filter(a => a.id && a.id === input.item.toLowerCase())[0]
-    if (!item) return res.status(404).json({ statusCode: 404, data: null, msg: 'invalid_item' })
-    if (!item.variants || !item.variants[0]) return res.status(404).json({ statusCode: 404, data: null, msg: 'no_results' })
+    if (!type || !Assets[type]) return res.status(400).json({ statusCode: 400, msg: 'Invalid type' })
+    const ItemMatch = (
+      Assets[type].find(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.item.toLowerCase())[0]) || // Name match
+      Assets[type].find(a => a.id && a.id.toLowerCase() === input.item.toLowerCase()) // ID match
+    )
+    if (!ItemMatch) return res.status(404).json({ statusCode: 404, data: null, msg: 'invalid_item' })
+    if (!ItemMatch.variants || !ItemMatch.variants[0]) return res.status(404).json({ statusCode: 404, data: null, msg: 'no_results' })
     const Match = (
-      item.variants.filter(t => t.tags && t.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0])[0] || // Name match
-      item.variants.filter(t => t.tags && t.tags.filter(a => a.tag && a.tag.toLowerCase() === input.query.toLowerCase())[0])[0] // ID match
+      ItemMatch.variants.filter(t => t.tags && t.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0])[0] || // Name match
+      ItemMatch.variants.filter(t => t.tags && t.tags.filter(a => a.tag && a.tag.toLowerCase() === input.query.toLowerCase())[0])[0] // ID match
     )
     if (Match) {
       const MatchTag = (
         Match.tags.filter(a => a.name && Object.keys(a.name).filter(b => a.name[b].toLowerCase() === input.query.toLowerCase())[0])[0] ||
         Match.tags.filter(a => a.tag && a.tag.toLowerCase() === input.query.toLowerCase())[0]
       )
-      return res.status(200).json({ statusCode: 200, data: { parent: item.id, channel: Match.channel, tag: MatchTag.tag, name: MatchTag.name } })
+      return res.status(200).json({ statusCode: 200, data: { parent: ItemMatch.id, channel: Match.channel, tag: MatchTag.tag, name: MatchTag.name } })
     };
     return res.status(404).json({
       statusCode: 404,
