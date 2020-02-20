@@ -119,5 +119,8 @@ function buildRarity (rarity) {
 
 function findImport (definition) {
   if (!definition) return false
+  if (typeof definition === 'object') {
+    return definition[0].toLowerCase()
+  };
   return definition.toLowerCase()
 };
