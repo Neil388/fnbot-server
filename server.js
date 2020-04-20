@@ -114,7 +114,7 @@ async function assetDump (firstDump) {
     aes = global.arguments.aes
     force = true
   };
-  if (assets && global.build.fortnite.build === assets.build && !force && !global.arguments.forcedump && !global.arguments.fd) {
+  if (assets && global.build && global.build.fortnite.build === assets.build && !force && !global.arguments.forcedump && !global.arguments.fd) {
     paks = await AssetDumping.getPakList('encrypted_only', aes, config.assetdumping.pakpath, false, useKeychain)
     config.assetdumping.build = global.build.fortnite.build
     if (((!paks.main || !paks.main[0]) && (!paks.encrypted || !paks.encrypted[0])) || !paks.encrypted.filter(pak => !cachedPaks.includes(pak.name))[0]) {
@@ -129,7 +129,7 @@ async function assetDump (firstDump) {
   };
   let totalAssets = 0
   if (assets) totalAssets = assets.skins.length + assets.emotes.length + assets.backpacks.length + assets.pickaxes.length
-  if (!assets || global.build.fortnite.build !== assets.build || (aes && force) || totalAssets === 0 || global.arguments.forcedump || global.arguments.fd) {
+  if (!assets || !global.build || global.build.fortnite.build !== assets.build || (aes && force) || totalAssets === 0 || global.arguments.forcedump || global.arguments.fd) {
     paks = await AssetDumping.getPakList('all', aes, config.assetdumping.pakpath, force, useKeychain)
     config.assetdumping.build = global.build.fortnite.build
     if (assets && global.build.fortnite.build !== assets.build) {

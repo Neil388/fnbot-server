@@ -57,8 +57,9 @@ export async function processDump (paks, type, path, options) {
     const exists = fs.existsSync('./storage/assets.json')
     if (exists) oldAssets = getAssets()
   };
-  if (paks.main && paks.main.filter(pak => pak.name === 'pakchunk0-WindowsClient.pak')[0]) {
-    const pak = paks.main.filter(pak => pak.name === 'pakchunk0-WindowsClient.pak')[0]
+  console.log(paks.main)
+  if (paks.main && paks.main.find(pak => pak.name === 'pakchunk10_s17-WindowsClient.pak')) {
+    const pak = paks.main.find(pak => pak.name === 'pakchunk10_s17-WindowsClient.pak')
     locales = LocaleDump.default({ path: path + pak.name, key: (pak.key).replace('0x', '') }, options.locales)
   };
   paks.main.forEach(pak => extractors.push(new PakExtractor(path + pak.name, (pak.key).replace('0x', ''))))

@@ -44,7 +44,7 @@ export function constructor (options) {
       return resolve(app)
     }).on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
-        console.error('  !!! ERROR: Port ' + err.port + ' is already used. You must use a different port or stop applications that use this port.')
+        console.error('  !!! ERROR: Port ' + err.port + ' is already in use. You must use a different port or stop applications that use this port.')
         process.exit(1)
       } else {
         console.error(err)

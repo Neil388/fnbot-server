@@ -8,7 +8,8 @@ export const PATHS = [
   'UI/Foundation/Textures/Icons/Emotes',
   'UI/Foundation/Textures/Icons/Weapons/Items',
   'UI/Foundation/Textures/Icons/Heroes/Athena/Soldier',
-  'UI/Foundation/Textures/Icons/Heroes/Progressive'
+  'UI/Foundation/Textures/Icons/Heroes/Progressive',
+  'Localization/Fortnite_locchunk10'
   // 'UI/Foundation/Textures/Icons/Heroes/Variants' not used yet
 ]
 

@@ -1,5 +1,5 @@
 export const BENBOT = Object.freeze({
-  AES: 'http://benbotfn.tk:8080/api/aes'
+  AES: 'https://benbotfn.tk/api/v1/aes'
 })
 
 export const FORTNITE = Object.freeze({

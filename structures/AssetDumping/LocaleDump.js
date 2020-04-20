@@ -8,9 +8,9 @@ export default function dump (pak, loc) {
     path: v,
     index: idx
   }))
-  let Locales = pak0list.filter(i => i.path.includes('Localization/Game_BR/') && i.path.includes('.locres'))
+  let Locales = pak0list.filter(i => i.path.includes('Localization/Fortnite_locchunk10/') && i.path.includes('.locres'))
   if (loc && loc instanceof Array && loc[0]) {
-    Locales = Locales.filter(l => loc.includes(l.path.split('Localization/Game_BR/')[1].split('/')[0]))
+    Locales = Locales.filter(l => loc.includes(l.path.split('Localization/Fortnite_locchunk10/')[1].split('/')[0]))
   };
   for (let i = 0; i < Locales.length; i++) {
     const filepath = Locales[i]
@@ -21,7 +21,7 @@ export default function dump (pak, loc) {
       data.string_data[0].data.forEach(d => {
         formattedObj[d.key] = d.data
       })
-      locales[filepath.path.split('Localization/Game_BR/')[1].split('/')[0]] = formattedObj
+      locales[filepath.path.split('Localization/Fortnite_locchunk10/')[1].split('/')[0]] = formattedObj
     };
   };
   console.log('  => Loaded ' + Object.keys(locales).length + ' locales: ' + Object.keys(locales).map(key => key).sort().join(', '))

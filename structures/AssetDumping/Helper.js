@@ -11,7 +11,7 @@ export function filterPaths (paths) {
     return PATHS.map(p => {
       const index = path.path.indexOf(p)
       if (index <= -1) return false
-      if (path.path.slice(index + p.length + 1).includes('/')) return false
+      if (!(path.path.indexOf('locres') > -1) && path.path.slice(index + p.length + 1).includes('/')) return false
       return true
     }).filter(v => v).length > 0
   })
