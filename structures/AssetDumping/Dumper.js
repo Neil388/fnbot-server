@@ -57,20 +57,23 @@ export async function processDump (paks, type, path, options) {
     const exists = fs.existsSync('./storage/assets.json')
     if (exists) oldAssets = getAssets()
   };
-  if (paks.main && paks.main.find(pak => pak.name === 'pakchunk10_s17-WindowsClient.pak')) {
-    const pak = paks.main.find(pak => pak.name === 'pakchunk10_s17-WindowsClient.pak')
-    locales = LocaleDump.default({ path: path + pak.name, key: (pak.key).replace('0x', '') }, options.locales)
-  };
   paks.main.forEach(pak => extractors.push(new PakExtractor(path + pak.name, (pak.key).replace('0x', ''))))
   paks.encrypted.forEach(pak => extractors.push(new PakExtractor(path + pak.name, (pak.key).replace('0x', ''))))
   let cosmetics = []
+  let localeDump = false
   extractors.forEach(extractor => {
     cosmetics = cosmetics.concat(extractor.get_file_list().map((file, idx) => ({
       path: file.replace('FortniteGame/Content/', ''),
       index: idx,
       extractor: extractor
     })))
+    if (!localeDump && cosmetics.find(c => c.path.includes('Localization/Fortnite_locchunk10'))) {
+      localeDump = extractor
+    };
   })
+  if (localeDump) {
+    locales = LocaleDump.default(localeDump, options.locales)
+  };
   const assetFiles = {}
   const Items = Helper.filterPaths(cosmetics)
   let mode = 'memory'

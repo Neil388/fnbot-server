@@ -1,10 +1,10 @@
 // eslint-disable-next-line camelcase
-import { PakExtractor, read_locale } from 'node-wick'
+import { read_locale } from 'node-wick'
 
-export default function dump (pak, loc) {
+export default function dump (Extractor, loc) {
+  if (!Extractor) { return };
   const locales = {}
-  const pakextractor = new PakExtractor(pak.path, pak.key)
-  const pak0list = pakextractor.get_file_list().map((v, idx) => ({
+  const pak0list = Extractor.get_file_list().map((v, idx) => ({
     path: v,
     index: idx
   }))
@@ -14,7 +14,7 @@ export default function dump (pak, loc) {
   };
   for (let i = 0; i < Locales.length; i++) {
     const filepath = Locales[i]
-    const file = pakextractor.get_file(filepath.index)
+    const file = Extractor.get_file(filepath.index)
     if (file != null) {
       const data = read_locale(file)
       const formattedObj = {}
